@@ -1,0 +1,25 @@
+{"id": "C001", "query": "英文规格书里法兰的材质等级是什么", "expected_docs": ["flange_spec_en.txt"], "expected_keywords": ["material grade"], "lang": "zh", "category": "crosslingual"}
+{"id": "C002", "query": "英文资料里法兰符合哪个欧洲标准", "expected_docs": ["flange_spec_en.txt"], "expected_keywords": ["en 1092-1"], "lang": "zh", "category": "crosslingual"}
+{"id": "C003", "query": "英文规格书法兰的密封面是什么形式", "expected_docs": ["flange_spec_en.txt"], "expected_keywords": ["raised face"], "lang": "zh", "category": "crosslingual"}
+{"id": "C004", "query": "英文资料说法兰每箱装多少片", "expected_docs": ["flange_spec_en.txt"], "expected_keywords": ["50 pieces per case"], "lang": "zh", "category": "crosslingual"}
+{"id": "C005", "query": "316L材质在英文订单里要怎么标注", "expected_docs": ["flange_spec_en.txt"], "expected_keywords": ["specified separately"], "lang": "zh", "category": "crosslingual"}
+{"id": "C006", "query": "英文规格书里法兰的工作温度范围", "expected_docs": ["flange_spec_en.txt"], "expected_keywords": ["-20°c to 200°c"], "lang": "zh", "category": "crosslingual"}
+{"id": "C007", "query": "英文资料说法兰能用于哪些介质", "expected_docs": ["flange_spec_en.txt"], "expected_keywords": ["steam"], "lang": "zh", "category": "crosslingual"}
+{"id": "C008", "query": "英文规格书里的法兰是什么类型", "expected_docs": ["flange_spec_en.txt"], "expected_keywords": ["plate flange"], "lang": "zh", "category": "crosslingual"}
+{"id": "C009", "query": "西语搅拌机资料的额定电压是多少", "expected_docs": ["blender_spec_es.txt"], "expected_keywords": ["380 v"], "lang": "zh", "category": "crosslingual"}
+{"id": "C010", "query": "西语规格书里搅拌机功率多大", "expected_docs": ["blender_spec_es.txt"], "expected_keywords": ["7,5 kw"], "lang": "zh", "category": "crosslingual"}
+{"id": "C011", "query": "西语资料里搅拌机防护等级怎么写", "expected_docs": ["blender_spec_es.txt"], "expected_keywords": ["ip55"], "lang": "zh", "category": "crosslingual"}
+{"id": "C012", "query": "西语资料里搅拌机的容量是多少", "expected_docs": ["blender_spec_es.txt"], "expected_keywords": ["500 litros"], "lang": "zh", "category": "crosslingual"}
+{"id": "C013", "query": "西语规格书搅拌机噪音分贝", "expected_docs": ["blender_spec_es.txt"], "expected_keywords": ["75 db"], "lang": "zh", "category": "crosslingual"}
+{"id": "C014", "query": "西语资料里罐体用什么材质", "expected_docs": ["blender_spec_es.txt"], "expected_keywords": ["acero inoxidable 304"], "lang": "zh", "category": "crosslingual"}
+{"id": "C015", "query": "西语资料搅拌机适用什么场景", "expected_docs": ["blender_spec_es.txt"], "expected_keywords": ["líquidos químicos"], "lang": "zh", "category": "crosslingual"}
+{"id": "C016", "query": "西语规格书里搅拌机频率是多少", "expected_docs": ["blender_spec_es.txt"], "expected_keywords": ["50 hz"], "lang": "zh", "category": "crosslingual"}
+{"id": "C017", "query": "阿拉伯语资料里法兰用什么材质", "expected_docs": ["flange_spec_ar.txt"], "expected_keywords": ["304 / 316l"], "lang": "zh", "category": "crosslingual"}
+{"id": "C018", "query": "阿拉伯语规格书的法兰尺寸是多少", "expected_docs": ["flange_spec_ar.txt"], "expected_keywords": ["dn50"], "lang": "zh", "category": "crosslingual"}
+{"id": "C019", "query": "阿拉伯语资料法兰的压力等级", "expected_docs": ["flange_spec_ar.txt"], "expected_keywords": ["pn16"], "lang": "zh", "category": "crosslingual"}
+{"id": "C020", "query": "阿拉伯语资料法兰的工作温度", "expected_docs": ["flange_spec_ar.txt"], "expected_keywords": ["200"], "lang": "zh", "category": "crosslingual"}
+{"id": "C021", "query": "阿拉伯语资料里法兰执行什么标准", "expected_docs": ["flange_spec_ar.txt"], "expected_keywords": ["en 1092-1"], "lang": "zh", "category": "crosslingual"}
+{"id": "C022", "query": "阿拉伯语资料说法兰用在什么地方", "expected_docs": ["flange_spec_ar.txt"], "expected_keywords": ["الماء"], "lang": "zh", "category": "crosslingual"}
+{"id": "C023", "query": "阿拉伯语资料里316L怎么说明", "expected_docs": ["flange_spec_ar.txt"], "expected_keywords": ["316l"], "lang": "zh", "category": "crosslingual"}
+{"id": "C024", "query": "多语言资料里DN50法兰的压力等级是多少", "expected_docs": ["flange_spec_en.txt", "flange_spec_ar.txt"], "expected_keywords": ["pn16"], "lang": "zh", "category": "crosslingual"}
+{"id": "C025", "query": "海外客户的搅拌机资料里电压和防护等级是多少", "expected_docs": ["blender_spec_es.txt"], "expected_keywords": ["ip55"], "lang": "zh", "category": "crosslingual"}

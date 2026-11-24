@@ -1,0 +1,54 @@
+# ===== M1 基础框架（当前步骤安装的部分）=====
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic==2.10.4
+pydantic-settings==2.7.1
+
+# ===== M1 步骤2：认证与数据库 =====
+sqlalchemy==2.0.36
+passlib==1.7.4
+bcrypt==4.0.1
+python-jose[cryptography]==3.3.0
+
+
+# ===== M1 步骤3：文件上传（multipart 表单）=====
+python-multipart==0.0.20
+
+# ===== M2 离线流水线（后续步骤启用）=====
+# celery[redis]
+pymupdf==1.24.14
+python-docx==1.1.2
+openpyxl==3.1.5
+# paddleocr               # 重型方案（需 paddlepaddle），本项目默认用下面的 RapidOCR
+# FlagEmbedding           # bge-m3 的另一种加载方式（本项目默认走 sentence-transformers）
+# bm25s
+
+# ===== M2 OCR：扫描件识别（步骤8）=====
+rapidocr-onnxruntime      # 轻量 OCR（PP-OCR ONNX 版，自带中英文模型，CPU 可跑）
+onnxruntime                # RapidOCR 推理后端
+
+# ===== M2/M3 真实模型：嵌入 + 重排（步骤8）=====
+sentence-transformers      # 加载 bge-m3 / bge-reranker（会自动带 torch，体积较大）
+
+# ===== M2/M3 向量库 =====
+pymilvus==2.5.14               # Milvus 客户端（服务器 2.4.15；2.5 客户端向下兼容，且支持 Python 3.13）
+
+# ===== M3 在线问答 =====
+# openai                 # DeepSeek/Qwen 均走 OpenAI 兼容协议
+httpx                   # 亦为 pytest TestClient 必需
+
+# ===== M4 SQL 通道（五铁律）=====
+sqlglot==30.30.0        # SQL AST 解析，用于守卫（单条 SELECT/白名单视图/禁 UNION）
+
+# ===== M5 可观测 =====
+# 11-2：官方指标库（Histogram 才能算窗口 P95、多副本才能聚合）
+prometheus-client==0.21.0
+langfuse==2.59.0            # 全链路追踪 SDK（11-1）；v2 轻量服务端配套，v3 需 ClickHouse 栈
+
+# ===== M6 生产化：数据库迁移（步骤10-1）=====
+alembic==1.20.1          # 结构化迁移（create_all 不会给老表加列，生产必须用迁移）
+psycopg[binary]==3.3.8   # PostgreSQL 驱动（psycopg3，Windows 有预编译轮子，免装编译工具）
+
+# ===== M6 生产化：异步摄入流水线（步骤10-2）=====
+celery==5.7.0            # 分布式任务队列（Windows 下用 solo 池，生产 Linux 用 prefork）
+redis==6.4.0             # broker 客户端；锁 6.x —— 8.x 默认协商 RESP3，Redis 5/6 会报 unknown command HELLO

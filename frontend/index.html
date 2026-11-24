@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>问答 · TradeRAG 外贸知识库</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23181640'/%3E%3Ccircle cx='9' cy='16' r='3' fill='%232dd4bf'/%3E%3Ctext x='15' y='22' font-family='Arial' font-size='16' font-weight='bold' fill='%23d9dbf4'%3ET%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="assets/app.css?v=20261117b" />
+</head>
+<body>
+<div class="app">
+  <!-- 侧栏 -->
+  <aside class="sidebar">
+    <div class="side-head" id="side-head"></div>
+    <div class="cap-hint" id="capability-hint">能力探针加载中…</div>
+
+    <button class="new-chat" id="new-session">＋ 新建会话</button>
+
+    <div class="sidebar-search">
+      <span class="ic">⌕</span>
+      <input id="session-search" type="text" placeholder="搜索会话…" autocomplete="off" />
+    </div>
+
+    <div class="sessions" id="session-list"></div>
+
+    <div class="side-nav" id="side-nav"></div>
+    <div class="side-foot" id="side-foot"></div>
+  </aside>
+
+  <!-- 主区 -->
+  <main class="main">
+    <header class="chat-head">
+      <div class="grow">
+        <div class="row gap-6">
+          <h2 id="session-title">新会话</h2>
+          <span class="faint tiny">✎</span>
+        </div>
+        <div class="sub">回答仅依据你的业务组可见文档 · 引用保留原文，跨语言内容标注“机器翻译”</div>
+      </div>
+      <span class="chip line" id="model-chip">—</span>
+    </header>
+
+    <div class="thread" id="messages">
+      <div class="empty-state" id="empty-state">
+        <div class="es-mark">TR</div>
+        <div class="big">外贸知识，一问即达</div>
+        <div class="sub">单证、认证、报价、合规都可以问；回答会附上引用原文</div>
+      </div>
+    </div>
+
+    <div class="composer-wrap">
+      <div class="composer">
+        <div class="hints">
+          <button class="hint" data-hint="DAP 和 DDP 有什么区别？">DAP 和 DDP 的区别</button>
+          <button class="hint" data-hint="灯串出口沙特要什么认证？">出口沙特要什么认证</button>
+          <button class="hint" data-hint="信用证最迟交单期是多少天？">信用证交单期</button>
+          <button class="hint" data-hint="报关需要哪些单据？">报关需要哪些单据</button>
+        </div>
+        <div class="input-card">
+          <textarea id="input" rows="2" placeholder="问点什么…外贸单证、认证、报价、合规都可以（Enter 发送 / Shift+Enter 换行）"></textarea>
+          <div class="input-foot">
+            <div class="row gap-4">
+              <span class="tool">＋ 附件</span>
+              <span class="tool">外贸单证库</span>
+              <span class="tool">自动引用</span>
+            </div>
+            <div class="row gap-10">
+              <span class="faint small">Enter 发送</span>
+              <button class="send-round" id="send" title="发送">↑</button>
+            </div>
+          </div>
+        </div>
+        <div class="disclaimer">回答由大模型基于知识库原文生成，请以引用原文为准 · 敏感问题会被合规拦截</div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="modal-root"></div>
+<script type="module" src="assets/chat.js?v=20261117b"></script>
+</body>
+</html>

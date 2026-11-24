@@ -1,0 +1,146 @@
+{
+  "uid": "rag-quality",
+  "title": "RAG 答案质量与评测（调优期核心）",
+  "tags": ["rag", "quality", "eval"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "30s",
+  "time": { "from": "now-6h", "to": "now" },
+  "editable": true,
+  "graphTooltip": 1,
+  "annotations": { "list": [] },
+  "templating": { "list": [] },
+  "panels": [
+    {
+      "id": 1, "type": "timeseries", "title": "离线评测分数（Recall@K，按 dataset）",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prom" },
+      "targets": [
+        { "refId": "A", "expr": "rag_eval_retrieval_recall", "legendFormat": "{{dataset}}" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0, "max": 1, "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 10 }, "thresholds": { "mode": "absolute", "steps": [ { "color": "red", "value": null }, { "color": "orange", "value": 0.6 }, { "color": "green", "value": 0.8 } ] } } , "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true } }
+    },
+    {
+      "id": 2, "type": "timeseries", "title": "排序质量（MRR + nDCG，按 dataset）",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prom" },
+      "targets": [
+        { "refId": "A", "expr": "rag_eval_mrr", "legendFormat": "MRR {{dataset}}" },
+        { "refId": "B", "expr": "rag_eval_ndcg", "legendFormat": "nDCG {{dataset}}" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "short", "min": 0, "max": 1, "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 8 } } , "overrides": [] },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true, "calcs": ["lastNotNull"] } }
+    },
+
+    {
+      "id": 10, "type": "timeseries", "title": "答案质量（Faithfulness / Relevance / Compliance Acc，按 dataset）",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 8 },
+      "datasource": { "type": "prometheus", "uid": "prom" },
+      "targets": [
+        { "refId": "A", "expr": "rag_eval_faithfulness", "legendFormat": "faith {{dataset}}" },
+        { "refId": "B", "expr": "rag_eval_answer_relevance", "legendFormat": "relv {{dataset}}" },
+        { "refId": "C", "expr": "rag_eval_compliance_accuracy", "legendFormat": "compl {{dataset}}" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0, "max": 1, "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 6 } } , "overrides": [] },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true, "calcs": ["lastNotNull"] } }
+    },
+
+    {
+      "id": 20, "type": "timeseries", "title": "各检索通道 0 命中率（告警阈值 5%）",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+      "datasource": { "type": "prometheus", "uid": "prom" },
+      "targets": [
+        { "refId": "A", "expr": "sum by (channel) (rate(rag_retrieval_empty_total[15m])) / clamp_min(sum by (channel) (rate(rag_retrieval_total[15m])), 1e-9)", "legendFormat": "{{channel}}" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0, "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 10 }, "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "orange", "value": 0.03 }, { "color": "red", "value": 0.08 } ] } } , "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true } }
+    },
+    {
+      "id": 21, "type": "timeseries", "title": "各检索通道平均命中数",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
+      "datasource": { "type": "prometheus", "uid": "prom" },
+      "targets": [
+        { "refId": "A", "expr": "sum by (channel) (rate(rag_retrieval_hits_count_sum[15m])) / clamp_min(sum by (channel) (rate(rag_retrieval_hits_count_count[15m])), 1e-9)", "legendFormat": "{{channel}}" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "short", "min": 0, "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 10 } } , "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true } }
+    },
+
+    {
+      "id": 30, "type": "timeseries", "title": "单检索通道耗时 P95（调通道预算用）",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 24 },
+      "datasource": { "type": "prometheus", "uid": "prom" },
+      "targets": [
+        { "refId": "A", "expr": "histogram_quantile(0.95, sum by (le, channel) (rate(rag_retrieval_channel_duration_seconds_bucket[10m])))", "legendFormat": "{{channel}} P95" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "s", "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 8 } } , "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true } }
+    },
+    {
+      "id": 31, "type": "timeseries", "title": "上下文噪音占比 P95（越高越可能稀释证据）",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 24 },
+      "datasource": { "type": "prometheus", "uid": "prom" },
+      "targets": [
+        { "refId": "A", "expr": "histogram_quantile(0.95, sum by (le) (rate(rag_context_noise_ratio_bucket[10m])))", "legendFormat": "noise P95" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0, "max": 1, "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 10 }, "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "orange", "value": 0.4 }, { "color": "red", "value": 0.6 } ] } } , "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": false } }
+    },
+
+    {
+      "id": 40, "type": "timeseries", "title": "逐阶段耗时 P95（检索/重排/合规/生成）",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 32 },
+      "datasource": { "type": "prometheus", "uid": "prom" },
+      "targets": [
+        { "refId": "A", "expr": "histogram_quantile(0.95, sum by (le, stage) (rate(rag_chat_stage_duration_seconds_bucket[10m])))", "legendFormat": "{{stage}} P95" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "s", "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 6 } } , "overrides": [] },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true, "calcs": ["lastNotNull"] } }
+    },
+
+    {
+      "id": 50, "type": "timeseries", "title": "语义缓存命中率",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 40 },
+      "datasource": { "type": "prometheus", "uid": "prom" },
+      "targets": [
+        { "refId": "A", "expr": "sum(rate(rag_semantic_cache_hit_total[30m])) / clamp_min(sum(rate(rag_semantic_cache_hit_total[30m])) + sum(rate(rag_semantic_cache_miss_total[30m])), 1e-9)", "legendFormat": "cache_hit_ratio" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0, "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 10 } } , "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": false } }
+    },
+    {
+      "id": 51, "type": "timeseries", "title": "LLM / 检索 / API / 合规 错误分类",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 40 },
+      "datasource": { "type": "prometheus", "uid": "prom" },
+      "targets": [
+        { "refId": "A", "expr": "sum by (category) (rate(rag_error_category_total[30m]))", "legendFormat": "{{category}}" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "reqps", "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 10 } } , "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true } }
+    },
+
+    {
+      "id": 52, "type": "stat", "title": "整体检索命中率（1 - 0 命中率，15m）",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 48 },
+      "datasource": { "type": "prometheus", "uid": "prom" },
+      "targets": [
+        { "refId": "A", "expr": "1 - (sum(rate(rag_retrieval_empty_total[15m])) / clamp_min(sum(rate(rag_retrieval_total[15m])), 1e-9))", "legendFormat": "hit_rate" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0.8, "max": 1, "thresholds": { "mode": "absolute", "steps": [ { "color": "red", "value": null }, { "color": "orange", "value": 0.93 }, { "color": "green", "value": 0.97 } ] } } , "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] } }
+    },
+    {
+      "id": 53, "type": "timeseries", "title": "单次检索命中条数 P50 / P95（按通道）",
+      "gridPos": { "h": 8, "w": 16, "x": 8, "y": 48 },
+      "datasource": { "type": "prometheus", "uid": "prom" },
+      "targets": [
+        { "refId": "A", "expr": "histogram_quantile(0.50, sum by (le, channel) (rate(rag_retrieval_hits_count_bucket[15m])))", "legendFormat": "{{channel}} P50" },
+        { "refId": "B", "expr": "histogram_quantile(0.95, sum by (le, channel) (rate(rag_retrieval_hits_count_bucket[15m])))", "legendFormat": "{{channel}} P95" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "short", "min": 0, "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 6 } } , "overrides": [] },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true, "calcs": ["lastNotNull"] } }
+    }
+  ]
+}

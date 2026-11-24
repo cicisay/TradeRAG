@@ -1,0 +1,52 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+
+# ---- 本地环境与密钥（绝不入库）----
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+
+# ---- 运行数据（含上传文件、业务库、评测报告）----
+backend/data/
+backend/files/
+data/
+logs/
+*.sqlite3
+*.db
+*.log
+
+# ---- 本地模型权重（数 GB，用 scripts/download_model.py 重新拉取）----
+backend/models/
+models/
+
+# ---- 第三方二进制与前端依赖 ----
+node_modules/
+backend/data/_pgbin/
+backend/data/_redisbin/
+backend/data/pgdata/
+
+# ---- 临时快照与本地草稿 ----
+.snapshot/
+_d.json
+_e2e_ctx.json
+docs/ui-smoke/node_modules/
+docs/ui-preview/node_modules/
+
+# ---- IDE / OS ----
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+desktop.ini

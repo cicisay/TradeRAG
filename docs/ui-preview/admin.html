@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>TradeRAG · 模型配置页优化方案</title>
+<link rel="stylesheet" href="preview.css" />
+</head>
+<body>
+<div class="app">
+  <aside class="admin-side">
+    <div class="brand">
+      <div class="brand-mark">TR</div>
+      <div>
+        <div class="brand-name">TradeRAG</div>
+        <div class="brand-sub">管理后台</div>
+      </div>
+    </div>
+
+    <div class="nav">
+      <div class="nav-label">运营</div>
+      <div class="nav-item"><span class="ic">▤</span>概览</div>
+      <div class="nav-item"><span class="ic">▦</span>知识库</div>
+      <div class="nav-item"><span class="ic">▧</span>文档管理</div>
+      <div class="nav-item"><span class="ic">◧</span>处理任务</div>
+
+      <div class="nav-label">配置</div>
+      <div class="nav-item on"><span class="ic">◈</span>模型配置</div>
+      <div class="nav-item"><span class="ic">◫</span>合规规则</div>
+      <div class="nav-item"><span class="ic">◇</span>业务组</div>
+
+      <div class="nav-label">监察</div>
+      <div class="nav-item"><span class="ic">◔</span>监控看板</div>
+      <div class="nav-item"><span class="ic">◎</span>审计日志</div>
+    </div>
+
+    <div style="flex:1"></div>
+    <div class="side-foot" style="margin:10px">
+      <div class="ava">管</div>
+      <div class="who">
+        <b>admin</b>
+        <span>系统管理员</span>
+      </div>
+    </div>
+  </aside>
+
+  <main class="admin-main">
+    <div class="page-head spread">
+      <div>
+        <h1>模型配置</h1>
+        <p>问答与翻译按调用链顺序尝试：主用排最前，其余启用项依次兜底。某个厂商故障或欠费时自动切换下一个，不必人工介入。</p>
+      </div>
+      <button class="btn primary">＋ 新增提供商</button>
+    </div>
+
+    <div class="page-body">
+
+      <div class="stat-row">
+        <div class="stat">
+          <div class="k">主用提供商</div>
+          <div class="v">MiniMax <small>M3.1-Flash</small></div>
+        </div>
+        <div class="stat">
+          <div class="k">故障备选</div>
+          <div class="v">2 <small>条启用</small></div>
+        </div>
+        <div class="stat">
+          <div class="k">今日调用</div>
+          <div class="v">1,284 <small>次 / 失败 3</small></div>
+        </div>
+        <div class="stat">
+          <div class="k">首字延迟 P95</div>
+          <div class="v">2.4 <small>秒</small></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <h3>当前调用链</h3>
+            <p>请求先走主用；连不上、401/429 或 5 秒内无响应时，自动落到下一条。流式回答若已经吐出文字则不再切换，避免两个模型的答案拼在一起。</p>
+          </div>
+          <span class="chip ok">链路健康</span>
+        </div>
+        <div class="chain">
+          <span class="chain-node first"><span class="dot ok"></span>MiniMax 主力<span class="faint small">M3.1-Flash</span></span>
+          <span class="chain-arrow">→</span>
+          <span class="chain-node"><span class="dot ok"></span>DeepSeek 备用<span class="faint small">deepseek-chat</span></span>
+          <span class="chain-arrow">→</span>
+          <span class="chain-node" style="opacity:.55"><span class="dot idle"></span>Ollama 本地<span class="faint small">已停用</span></span>
+          <span class="chain-note">兜底还会回落到 .env 内置厂商</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <h3>提供商列表</h3>
+            <p>Key 加密入库、界面只显示末 4 位；编辑时留空表示保持原值。所有改动立即生效，无需重启。</p>
+          </div>
+          <span class="row gap-8">
+            <span class="chip line">共 3 条</span>
+            <button class="btn sm">全部测试</button>
+          </span>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th style="width:190px">名称</th>
+              <th style="width:92px">厂商</th>
+              <th style="width:170px">模型</th>
+              <th>Base URL</th>
+              <th style="width:92px">API Key</th>
+              <th style="width:132px">连通性</th>
+              <th style="width:88px">状态</th>
+              <th style="width:248px">操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="t-name">MiniMax 主力 <span class="chip brand">主用</span></div>
+                <div class="t-sub">生产主力，中文问答</div>
+              </td>
+              <td><span class="chip">minimax</span></td>
+              <td class="mono">MiniMax-M3.1-Flash</td>
+              <td class="mono faint">api.minimaxi.com/v1</td>
+              <td class="mono">****zBfD</td>
+              <td><span class="dot ok"></span><span class="small">连通 1180ms</span></td>
+              <td><span class="chip ok">启用</span></td>
+              <td>
+                <span class="row gap-6">
+                  <button class="btn sm">测试</button>
+                  <button class="btn sm">停用</button>
+                  <button class="btn sm">编辑</button>
+                  <button class="btn sm">删除</button>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="t-name">DeepSeek 备用</div>
+                <div class="t-sub">MiniMax 欠费时接管</div>
+              </td>
+              <td><span class="chip">deepseek</span></td>
+              <td class="mono">deepseek-chat</td>
+              <td class="mono faint">api.deepseek.com</td>
+              <td class="mono">****9f2c</td>
+              <td><span class="dot idle"></span><span class="small faint">未测试</span></td>
+              <td><span class="chip ok">启用</span></td>
+              <td>
+                <span class="row gap-6">
+                  <button class="btn sm">测试</button>
+                  <button class="btn sm">设为主用</button>
+                  <button class="btn sm">编辑</button>
+                  <button class="btn sm">删除</button>
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="t-name">Ollama 本地</div>
+                <div class="t-sub">断网时离线兜底</div>
+              </td>
+              <td><span class="chip">ollama</span></td>
+              <td class="mono">qwen2.5:7b</td>
+              <td class="mono faint">127.0.0.1:11434/v1</td>
+              <td class="mono faint">无需 Key</td>
+              <td><span class="dot bad"></span><span class="small" style="color:var(--danger)">未启动</span></td>
+              <td><span class="chip">停用</span></td>
+              <td>
+                <span class="row gap-6">
+                  <button class="btn sm">测试</button>
+                  <button class="btn sm">启用</button>
+                  <button class="btn sm">编辑</button>
+                  <button class="btn sm">删除</button>
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div style="padding:11px 17px;border-top:1px solid var(--border);background:#fbfcfe" class="row gap-8">
+          <span class="chip line">提示</span>
+          <span class="small muted">点「测试」会真实发一条 8 token 的请求，验证 Key、地址、模型名三者是否都能用——比只看"保存成功"可靠。</span>
+        </div>
+      </div>
+
+      <div class="guide">
+        <div class="guide-item">
+          <b><span class="step-n">1</span>至少配两条</b>
+          <span>单厂商欠费、限流、区域性故障都会让问答整体不可用。主用 + 备用是最低配置。</span>
+        </div>
+        <div class="guide-item">
+          <b><span class="step-n">2</span>先测再保存</b>
+          <span>新增弹窗里有「测试连接」，不用先存再发现地址少了 /v1 或模型名已下线。</span>
+        </div>
+        <div class="guide-item">
+          <b><span class="step-n">3</span>故障切换无感</b>
+          <span>切到备用后，界面仍标注实际作答的厂商（回答下方的 provider 标签）。</span>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,64 @@
+{"id": "R001", "query": "不锈钢法兰用什么材质", "expected_docs": ["法兰规格书_zh.txt"], "expected_keywords": ["304 / 316L"], "lang": "zh", "category": "product"}
+{"id": "R002", "query": "法兰的公称压力是多少", "expected_docs": ["法兰规格书_zh.txt"], "expected_keywords": ["PN10 / PN16 / PN25"], "lang": "zh", "category": "product"}
+{"id": "R003", "query": "法兰执行什么标准", "expected_docs": ["法兰规格书_zh.txt"], "expected_keywords": ["HG/T 20592-2009"], "lang": "zh", "category": "product"}
+{"id": "R004", "query": "DN50法兰的工作温度范围", "expected_docs": ["法兰规格书_zh.txt"], "expected_keywords": ["-20℃ ~ 200℃"], "lang": "zh", "category": "product"}
+{"id": "R005", "query": "法兰的密封面是什么形式", "expected_docs": ["法兰规格书_zh.txt"], "expected_keywords": ["RF 突面"], "lang": "zh", "category": "product"}
+{"id": "R006", "query": "316L法兰下单要注意什么", "expected_docs": ["法兰规格书_zh.txt"], "expected_keywords": ["单独注明"], "lang": "zh", "category": "product"}
+{"id": "R007", "query": "法兰包装每箱多少片", "expected_docs": ["法兰规格书_zh.txt"], "expected_keywords": ["每箱 50 片"], "lang": "zh", "category": "product"}
+{"id": "R008", "query": "法兰适用哪些介质", "expected_docs": ["法兰规格书_zh.txt"], "expected_keywords": ["弱腐蚀性液体"], "lang": "zh", "category": "product"}
+
+{"id": "R009", "query": "球阀的型号是什么", "expected_docs": ["球阀规格书_zh.txt"], "expected_keywords": ["Q41F-16P"], "lang": "zh", "category": "product"}
+{"id": "R010", "query": "球阀强度试验压力多少", "expected_docs": ["球阀规格书_zh.txt"], "expected_keywords": ["2.4MPa"], "lang": "zh", "category": "product"}
+{"id": "R011", "query": "球阀适用哪些介质", "expected_docs": ["球阀规格书_zh.txt"], "expected_keywords": ["水、气体、油品"], "lang": "zh", "category": "product"}
+{"id": "R012", "query": "球阀的连接方式", "expected_docs": ["球阀规格书_zh.txt"], "expected_keywords": ["法兰连接"], "lang": "zh", "category": "product"}
+{"id": "R013", "query": "球阀密封材料是什么", "expected_docs": ["球阀规格书_zh.txt"], "expected_keywords": ["PTFE"], "lang": "zh", "category": "product"}
+{"id": "R014", "query": "球阀工作温度范围", "expected_docs": ["球阀规格书_zh.txt"], "expected_keywords": ["-10℃ ~ 150℃"], "lang": "zh", "category": "product"}
+
+{"id": "R015", "query": "搅拌机额定电压是多少", "expected_docs": ["搅拌机规格书_zh.txt"], "expected_keywords": ["380V"], "lang": "zh", "category": "product"}
+{"id": "R016", "query": "搅拌机功率多大", "expected_docs": ["搅拌机规格书_zh.txt"], "expected_keywords": ["7.5kW"], "lang": "zh", "category": "product"}
+{"id": "R017", "query": "搅拌机防护等级是多少", "expected_docs": ["搅拌机规格书_zh.txt"], "expected_keywords": ["IP55"], "lang": "zh", "category": "product"}
+{"id": "R018", "query": "搅拌机噪音要求", "expected_docs": ["搅拌机规格书_zh.txt"], "expected_keywords": ["75dB"], "lang": "zh", "category": "product"}
+{"id": "R019", "query": "搅拌机容量多大", "expected_docs": ["搅拌机规格书_zh.txt"], "expected_keywords": ["500L"], "lang": "zh", "category": "product"}
+{"id": "R020", "query": "搅拌机转速是多少", "expected_docs": ["搅拌机规格书_zh.txt"], "expected_keywords": ["1450rpm"], "lang": "zh", "category": "product"}
+
+{"id": "R021", "query": "商业发票需要包含哪些内容", "expected_docs": ["商业发票要素_zh.txt"], "expected_keywords": ["发票号码"], "lang": "zh", "category": "customs"}
+{"id": "R022", "query": "发票上的贸易术语怎么填", "expected_docs": ["商业发票要素_zh.txt"], "expected_keywords": ["FOB Shanghai"], "lang": "zh", "category": "customs"}
+{"id": "R023", "query": "CIF发票要单列哪些费用", "expected_docs": ["商业发票要素_zh.txt"], "expected_keywords": ["运费与保险费"], "lang": "zh", "category": "customs"}
+{"id": "R024", "query": "发票金额和报关单不一致可以吗", "expected_docs": ["商业发票要素_zh.txt"], "expected_keywords": ["必须与报关单"], "lang": "zh", "category": "customs"}
+{"id": "R025", "query": "发票上的HS编码写在哪里", "expected_docs": ["商业发票要素_zh.txt"], "expected_keywords": ["HS 编码"], "lang": "zh", "category": "customs"}
+
+{"id": "R026", "query": "信用证最迟交单期是多少天", "expected_docs": ["信用证交单要求_zh.txt"], "expected_keywords": ["21 天"], "lang": "zh", "category": "customs"}
+{"id": "R027", "query": "交单期和装运期是一回事吗", "expected_docs": ["信用证交单要求_zh.txt"], "expected_keywords": ["两个不同日期"], "lang": "zh", "category": "customs"}
+{"id": "R028", "query": "信用证交单需要哪些单据", "expected_docs": ["信用证交单要求_zh.txt"], "expected_keywords": ["保险单"], "lang": "zh", "category": "customs"}
+{"id": "R029", "query": "信用证对提单有什么要求", "expected_docs": ["信用证交单要求_zh.txt"], "expected_keywords": ["清洁已装船提单"], "lang": "zh", "category": "customs"}
+{"id": "R030", "query": "不符点银行几天内提出", "expected_docs": ["信用证交单要求_zh.txt"], "expected_keywords": ["5 个工作日"], "lang": "zh", "category": "customs"}
+
+{"id": "R031", "query": "DAP和DDP有什么区别", "expected_docs": ["Incoterms_DAP_DDP_zh.txt"], "expected_keywords": ["DAP", "DDP"], "lang": "zh", "category": "incoterms"}
+{"id": "R032", "query": "DDP谁承担进口关税", "expected_docs": ["Incoterms_DAP_DDP_zh.txt"], "expected_keywords": ["卖方承担进口清关与关税"], "lang": "zh", "category": "incoterms"}
+{"id": "R033", "query": "DAP谁负责进口清关", "expected_docs": ["Incoterms_DAP_DDP_zh.txt"], "expected_keywords": ["进口清关由买方承担"], "lang": "zh", "category": "incoterms"}
+{"id": "R034", "query": "DAP和DDP风险什么时候转移", "expected_docs": ["Incoterms_DAP_DDP_zh.txt"], "expected_keywords": ["目的地交货时转移"], "lang": "zh", "category": "incoterms"}
+{"id": "R035", "query": "没有进口资质应该选DAP还是DDP", "expected_docs": ["Incoterms_DAP_DDP_zh.txt"], "expected_keywords": ["买方有进口资质"], "lang": "zh", "category": "incoterms"}
+
+{"id": "R036", "query": "灯串出口沙特需要什么认证", "expected_docs": ["沙特SASO认证要求_zh.txt"], "expected_keywords": ["SASO 认证", "SABER"], "lang": "zh", "category": "compliance"}
+{"id": "R037", "query": "SABER平台注册流程是怎样的", "expected_docs": ["沙特SASO认证要求_zh.txt"], "expected_keywords": ["SABER 平台注册"], "lang": "zh", "category": "compliance"}
+{"id": "R038", "query": "沙特认证需要提供哪些文件", "expected_docs": ["沙特SASO认证要求_zh.txt"], "expected_keywords": ["测试报告"], "lang": "zh", "category": "compliance"}
+{"id": "R039", "query": "沙特电器产品能效要求", "expected_docs": ["沙特SASO认证要求_zh.txt"], "expected_keywords": ["SASO 2870"], "lang": "zh", "category": "compliance"}
+
+{"id": "R040", "query": "两用物项出口需要做哪些筛查", "expected_docs": ["出口管制合规须知_zh.txt"], "expected_keywords": ["最终用户", "制裁名单筛查"], "lang": "zh", "category": "compliance"}
+{"id": "R041", "query": "出口管制清单有哪些", "expected_docs": ["出口管制合规须知_zh.txt"], "expected_keywords": ["EAR", "双用途清单"], "lang": "zh", "category": "compliance"}
+{"id": "R042", "query": "制裁名单筛查要查哪些名单", "expected_docs": ["出口管制合规须知_zh.txt"], "expected_keywords": ["SDN、实体清单、UVL"], "lang": "zh", "category": "compliance"}
+{"id": "R043", "query": "出口管制记录要保存多久", "expected_docs": ["出口管制合规须知_zh.txt"], "expected_keywords": ["至少保存 5 年"], "lang": "zh", "category": "compliance"}
+{"id": "R044", "query": "物项归类怎么确认管制编码", "expected_docs": ["出口管制合规须知_zh.txt"], "expected_keywords": ["管制编码"], "lang": "zh", "category": "compliance"}
+
+{"id": "R045", "query": "欧盟客户的个人数据怎么处理", "expected_docs": ["欧盟PII处理规范_zh.txt"], "expected_keywords": ["最小必要"], "lang": "zh", "category": "policy"}
+{"id": "R046", "query": "个人数据跨境传输需要什么", "expected_docs": ["欧盟PII处理规范_zh.txt"], "expected_keywords": ["SCC"], "lang": "zh", "category": "policy"}
+{"id": "R047", "query": "数据泄露多久要报告", "expected_docs": ["欧盟PII处理规范_zh.txt"], "expected_keywords": ["72 小时"], "lang": "zh", "category": "policy"}
+{"id": "R048", "query": "客户要求删除个人数据怎么办", "expected_docs": ["欧盟PII处理规范_zh.txt"], "expected_keywords": ["删除", "数据主体权利"], "lang": "zh", "category": "policy"}
+{"id": "R049", "query": "GDPR的合法基础有哪些", "expected_docs": ["欧盟PII处理规范_zh.txt"], "expected_keywords": ["合同履行"], "lang": "zh", "category": "policy"}
+{"id": "R050", "query": "欧洲客户数据可以保存多久", "expected_docs": ["欧盟PII处理规范_zh.txt"], "expected_keywords": ["保存期限"], "lang": "zh", "category": "policy"}
+
+{"id": "R051", "query": "法兰和球阀的公称压力分别是多少", "expected_docs": ["法兰规格书_zh.txt", "球阀规格书_zh.txt"], "expected_keywords": ["PN16"], "lang": "zh", "category": "crossdoc"}
+{"id": "R052", "query": "出口沙特需要准备哪些单证", "expected_docs": ["商业发票要素_zh.txt", "沙特SASO认证要求_zh.txt"], "expected_keywords": ["发票与装箱单"], "lang": "zh", "category": "crossdoc"}
+{"id": "R053", "query": "CIF报价要包含哪些费用", "expected_docs": ["商业发票要素_zh.txt"], "expected_keywords": ["运费与保险费"], "lang": "zh", "category": "crossdoc"}
+{"id": "R054", "query": "信用证交单要提供保险单吗", "expected_docs": ["信用证交单要求_zh.txt"], "expected_keywords": ["保险单（CIF 时）"], "lang": "zh", "category": "crossdoc"}
+{"id": "R055", "query": "不锈钢产品的材质有哪几种", "expected_docs": ["法兰规格书_zh.txt", "球阀规格书_zh.txt", "搅拌机规格书_zh.txt"], "expected_keywords": ["304"], "lang": "zh", "category": "crossdoc"}

@@ -1,0 +1,46 @@
+# Prometheus 抓取配置（11-2）
+# 目标：
+# 1) rag-api：多副本时用 dns_sd 自动发现所有 api 容器的 A 记录，各抓各的，
+#    分位数由 PromQL 的 sum by (le) 聚合，不要指望副本间共享计数器。
+# 2) node：宿主机（Windows 下是 Docker Desktop 的 Linux VM，看 Windows 真实内存用任务管理器）。
+# 3) prometheus 自身：确认抓取与规则评估健康。
+global:
+  scrape_interval: 15s
+  scrape_timeout: 10s
+  evaluation_interval: 15s
+  external_labels:
+    stack: trade-rag
+    env: local
+
+rule_files:
+  - /etc/prometheus/alerts.yml
+
+scrape_configs:
+  - job_name: rag-api
+    metrics_path: /metrics
+    # 若 backend/.env 配了 METRICS_TOKEN，打开下面两行（文件内只放令牌本身）
+    # authorization:
+    #   credentials_file: /etc/prometheus/metrics_token
+    dns_sd_configs:
+      - names: ["api"]
+        type: A
+        port: 8000
+        refresh_interval: 30s
+
+  - job_name: node
+    static_configs:
+      - targets: ["node-exporter:9100"]
+
+  - job_name: postgres
+    static_configs:
+      - targets: ["postgres-exporter:9187"]
+        labels: { stack: trade-rag }
+
+  - job_name: redis
+    static_configs:
+      - targets: ["redis-exporter:9121"]
+        labels: { stack: trade-rag }
+
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]

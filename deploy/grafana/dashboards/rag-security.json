@@ -1,0 +1,89 @@
+{
+  "uid": "rag-security",
+  "title": "RAG 安全合规（审计/合规官）",
+  "tags": ["rag", "security", "compliance"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "30s",
+  "time": { "from": "now-6h", "to": "now" },
+  "editable": true,
+  "graphTooltip": 1,
+  "annotations": { "list": [] },
+  "templating": { "list": [] },
+  "panels": [
+    {
+      "id": 1, "type": "stat", "title": "安全拦截总数（进程内累计）",
+      "gridPos": { "h": 6, "w": 8, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prom" },
+      "targets": [{ "refId": "A", "expr": "sum(rate(rag_security_blocked_total[1h]))", "legendFormat": "blocks/h" }],
+      "fieldConfig": { "defaults": { "unit": "short" } , "overrides": [] }
+    },
+    {
+      "id": 2, "type": "stat", "title": "合规三层拦截分布",
+      "gridPos": { "h": 6, "w": 16, "x": 8, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prom" },
+      "targets": [
+        { "refId": "A", "expr": "rate(rag_compliance_block_layer_total{layer=\"lexicon\"}[1h])", "legendFormat": "lexicon" },
+        { "refId": "B", "expr": "rate(rag_compliance_block_layer_total{layer=\"rule\"}[1h])", "legendFormat": "rule" },
+        { "refId": "C", "expr": "rate(rag_compliance_block_layer_total{layer=\"llm\"}[1h])", "legendFormat": "llm" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "short" } , "overrides": [] }
+    },
+
+    {
+      "id": 10, "type": "timeseries", "title": "安全拦截趋势（按 type：rbac / lexicon / rule / llm / prompt_injection / pii）",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 6 },
+      "datasource": { "type": "prometheus", "uid": "prom" },
+      "targets": [
+        { "refId": "A", "expr": "sum by (type) (rate(rag_security_blocked_total[15m]))", "legendFormat": "{{type}}" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "reqps", "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 8 } } , "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true } }
+    },
+
+    {
+      "id": 20, "type": "timeseries", "title": "合规三层拦截占比（1h 滚动）",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 14 },
+      "datasource": { "type": "prometheus", "uid": "prom" },
+      "targets": [
+        { "refId": "A", "expr": "sum by (layer) (rate(rag_compliance_block_layer_total[1h])) / clamp_min(sum(rate(rag_compliance_block_layer_total[1h])), 1e-9)", "legendFormat": "{{layer}}" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "percentunit", "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 10 } } , "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true } }
+    },
+    {
+      "id": 21, "type": "timeseries", "title": "PII 脱敏触发（按 field_type）",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 14 },
+      "datasource": { "type": "prometheus", "uid": "prom" },
+      "targets": [
+        { "refId": "A", "expr": "sum by (field_type) (rate(rag_pii_masked_total[1h]))", "legendFormat": "{{field_type}}" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "reqps", "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 10 } } , "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true } }
+    },
+
+    {
+      "id": 30, "type": "timeseries", "title": "合规拦截率（block / accepted，目标 < 5%）",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 22 },
+      "datasource": { "type": "prometheus", "uid": "prom" },
+      "targets": [
+        { "refId": "A", "expr": "sum(rate(rag_stage_total{stage=\"accepted\",result=\"succeeded\"}[1h])) / clamp_min(sum(rate(rag_stage_total{stage=\"accepted\",result=\"entered\"}[1h])), 1e-9)", "legendFormat": "accept_rate" },
+        { "refId": "B", "expr": "sum(rate(rag_compliance_block_layer_total[1h])) / clamp_min(sum(rate(rag_stage_total{stage=\"accepted\",result=\"entered\"}[1h])), 1e-9)", "legendFormat": "block_rate" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0, "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 8 } } , "overrides": [] },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true, "calcs": ["lastNotNull"] } }
+    },
+
+    {
+      "id": 40, "type": "timeseries", "title": "评测集合规准确率（越高越好，目标 > 95%）",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 30 },
+      "datasource": { "type": "prometheus", "uid": "prom" },
+      "targets": [
+        { "refId": "A", "expr": "rag_eval_compliance_accuracy", "legendFormat": "{{dataset}}" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0.8, "max": 1, "custom": { "drawStyle": "line", "lineWidth": 2, "fillOpacity": 10 }, "thresholds": { "mode": "absolute", "steps": [ { "color": "red", "value": null }, { "color": "orange", "value": 0.9 }, { "color": "green", "value": 0.95 } ] } } , "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true } }
+    }
+  ]
+}

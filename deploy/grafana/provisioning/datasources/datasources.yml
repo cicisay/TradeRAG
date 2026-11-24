@@ -1,0 +1,31 @@
+# Grafana 数据源（11-2 自动装配，进容器即生效，不用点界面）
+# 1) Prometheus：实时技术指标
+# 2) RAG-PG：业务/质量/知识库指标（只读账号，见 deploy/postgres/init-grafana-ro.sql）
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    uid: prom
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    jsonData:
+      timeInterval: 15s
+
+  - name: RAG-PG
+    uid: ragpg
+    type: postgres
+    access: proxy
+    url: postgres:5432
+    database: rag
+    user: grafana_ro
+    secureJsonData:
+      password: grafana_ro_2026
+    jsonData:
+      sslmode: disable
+      postgresVersion: 1600
+      timescaledb: false
+      maxOpenConns: 4
+      maxIdleConns: 2
+      connMaxLifetime: 14400

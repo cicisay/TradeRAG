@@ -1,0 +1,713 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>管理后台 · 链路追踪模块 效果预览</title>
+<style>
+  :root {
+    --bg: #f6f6fb;
+    --surface: #ffffff;
+    --surface-2: #f1f1f8;
+    --border: #e5e6f0;
+    --border-strong: #d3d5e6;
+    --text: #1a1a2e;
+    --muted: #666b85;
+    --faint: #979ab5;
+    --brand: #4338ca;
+    --brand-2: #4f46e5;
+    --brand-3: #818cf8;
+    --brand-soft: #ecebfd;
+    --accent: #0d9488;
+    --accent-soft: #e4f5f1;
+    --topbar-bg: #181640;
+    --ok: #0f7b57;
+    --ok-soft: #e6f4ee;
+    --warn: #9a5b00;
+    --warn-soft: #fdf3e2;
+    --danger: #b42318;
+    --danger-soft: #fdecea;
+    --radius: 12px;
+    --shadow: 0 1px 2px rgba(16, 24, 40, .04), 0 8px 24px rgba(16, 24, 40, .06);
+    --mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: #e9eaf3; color: var(--text);
+    font-family: "Inter", "Segoe UI", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    font-size: 14px; line-height: 1.6; -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4 { margin: 0; font-weight: 650; letter-spacing: -.01em; }
+  p { margin: 0; }
+  button, select, input { font: inherit; color: inherit; }
+
+  /* ---------- 页外：方案切换 ---------- */
+  .probe {
+    max-width: 1560px; margin: 26px auto 14px; padding: 0 24px;
+    display: flex; align-items: flex-end; justify-content: space-between; gap: 24px;
+  }
+  .probe h1 { font-size: 19px; }
+  .probe .sub { color: var(--muted); font-size: 13px; margin-top: 2px; }
+  .seg { display: inline-flex; background: #fff; border: 1px solid var(--border-strong); border-radius: 10px; padding: 3px; gap: 2px; box-shadow: var(--shadow); }
+  .seg button {
+    border: 0; background: transparent; padding: 7px 16px; border-radius: 8px;
+    font-size: 13px; font-weight: 600; color: var(--muted); cursor: pointer; transition: .16s;
+  }
+  .seg button:hover { color: var(--brand); }
+  .seg button.on { background: var(--brand); color: #fff; box-shadow: 0 2px 8px rgba(67,56,202,.28); }
+
+  /* ---------- 浏览器窗口 ---------- */
+  .frame {
+    max-width: 1560px; margin: 0 auto 20px; background: var(--surface);
+    border-radius: 16px; box-shadow: 0 12px 48px rgba(24,22,64,.16), 0 1px 0 rgba(255,255,255,.6) inset;
+    overflow: hidden;
+  }
+  .chrome {
+    display: flex; align-items: center; gap: 10px; padding: 10px 16px;
+    background: linear-gradient(180deg, #f4f4fa, #ececf5); border-bottom: 1px solid var(--border);
+  }
+  .chrome .lights { display: flex; gap: 6px; }
+  .chrome .lights i { width: 10px; height: 10px; border-radius: 50%; display: block; }
+  .chrome .lights i:nth-child(1) { background: #ff5f57; }
+  .chrome .lights i:nth-child(2) { background: #febc2e; }
+  .chrome .lights i:nth-child(3) { background: #28c840; }
+  .chrome .url {
+    flex: 1; max-width: 460px; margin: 0 auto; background: #fff; border: 1px solid var(--border);
+    border-radius: 8px; padding: 4px 12px; font-family: var(--mono); font-size: 11.5px; color: var(--muted);
+    text-align: center;
+  }
+
+  /* ---------- 应用骨架 ---------- */
+  .app { display: grid; grid-template-columns: 212px 1fr; min-height: 860px; }
+  .side {
+    background: var(--topbar-bg); color: var(--topbar-text); padding: 16px 12px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .side .logo { display: flex; align-items: center; gap: 8px; padding: 0 8px 4px; }
+  .side .logo .mark {
+    width: 26px; height: 26px; border-radius: 8px; background: linear-gradient(135deg, #4f46e5, #0d9488);
+    display: grid; place-items: center; color: #fff; font-weight: 700; font-size: 13px;
+  }
+  .side .logo b { font-size: 14px; color: #fff; }
+  .side .logo small { display: block; font-size: 10px; letter-spacing: .1em; color: #8f93bd; text-transform: uppercase; }
+  .side .grp { font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #6f73a0; padding: 8px 8px 2px; }
+  .side nav { display: flex; flex-direction: column; gap: 2px; }
+  .side nav a {
+    display: flex; align-items: center; gap: 9px; padding: 8px 10px; border-radius: 8px;
+    color: #b6b8d8; font-size: 13px; text-decoration: none; transition: .15s;
+  }
+  .side nav a .ic { width: 14px; text-align: center; font-size: 12px; opacity: .8; }
+  .side nav a:hover { background: rgba(255,255,255,.07); color: #fff; }
+  .side nav a.on { background: rgba(255,255,255,.13); color: #fff; font-weight: 600; box-shadow: inset 2px 0 0 var(--accent); }
+  .side nav a .pill {
+    margin-left: auto; font-size: 10px; background: var(--accent); color: #04261f;
+    border-radius: 6px; padding: 0 6px; font-weight: 700;
+  }
+  .side .who { margin-top: auto; display: flex; align-items: center; gap: 8px; padding: 10px 8px 2px; border-top: 1px solid rgba(255,255,255,.09); }
+  .side .who .av { width: 26px; height: 26px; border-radius: 50%; background: #4f46e5; display: grid; place-items: center; font-size: 11px; color: #fff; font-weight: 600; }
+  .side .who span { font-size: 12px; color: #b6b8d8; }
+
+  main { padding: 20px 24px 28px; background: var(--bg); min-width: 0; }
+  .page-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
+  .page-head h1 { font-size: 21px; }
+  .page-head .desc { color: var(--muted); font-size: 12.5px; margin-top: 3px; }
+  .crumb { font-size: 12px; color: var(--faint); margin-bottom: 4px; }
+  .crumb b { color: var(--brand); font-weight: 600; }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--border-strong);
+    background: #fff; color: var(--text); padding: 7px 13px; border-radius: 9px; font-size: 12.5px;
+    font-weight: 600; cursor: pointer; transition: .16s; text-decoration: none;
+  }
+  .btn:hover { border-color: var(--brand-3); color: var(--brand); box-shadow: 0 2px 10px rgba(79,70,229,.12); transform: translateY(-1px); }
+  .btn.pri { background: var(--brand); border-color: var(--brand); color: #fff; }
+  .btn.pri:hover { background: var(--brand-2); color: #fff; }
+  .btn.ghost { border-color: transparent; background: transparent; color: var(--muted); }
+  .btn.sm { padding: 5px 10px; font-size: 12px; border-radius: 8px; }
+  .row { display: flex; align-items: center; gap: 8px; }
+  .spread { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+
+  /* ---------- 工具条 ---------- */
+  .toolbar {
+    background: #fff; border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 10px 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    box-shadow: var(--shadow); margin-bottom: 14px;
+  }
+  .field { display: flex; align-items: center; gap: 6px; }
+  .field > label { font-size: 12px; color: var(--faint); }
+  select, .search {
+    border: 1px solid var(--border-strong); background: #fff; border-radius: 8px;
+    padding: 6px 10px; font-size: 12.5px; color: var(--text); outline: none;
+  }
+  select:focus, .search:focus { border-color: var(--brand-3); box-shadow: 0 0 0 3px var(--brand-soft); }
+  .search { width: 240px; }
+  .toggle { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+  .toggle i {
+    width: 30px; height: 17px; border-radius: 99px; background: var(--brand); position: relative; display: inline-block;
+  }
+  .toggle i::after { content: ""; position: absolute; width: 13px; height: 13px; border-radius: 50%; background: #fff; top: 2px; right: 2px; }
+
+  /* ---------- 指标卡 ---------- */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 14px; }
+  .stat {
+    background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px;
+    box-shadow: var(--shadow); position: relative; overflow: hidden;
+  }
+  .stat::after { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--brand-3); }
+  .stat.warnline::after { background: #f0a500; }
+  .stat.dangerline::after { background: var(--danger); }
+  .stat.okline::after { background: var(--accent); }
+  .stat .k { font-size: 11.5px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+  .stat .v { font-size: 23px; font-weight: 700; letter-spacing: -.02em; margin-top: 2px; line-height: 1.25; }
+  .stat .v small { font-size: 12px; font-weight: 500; color: var(--muted); margin-left: 3px; }
+  .stat .h { font-size: 11px; color: var(--faint); margin-top: 2px; }
+  .up { color: var(--ok); font-weight: 600; }
+  .down { color: var(--danger); font-weight: 600; }
+
+  /* ---------- 主分栏 ---------- */
+  .split { display: grid; grid-template-columns: 316px 1fr; gap: 14px; align-items: start; }
+
+  .card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+  .card-head { display: flex; align-items: center; justify-content: space-between; padding: 11px 14px; border-bottom: 1px solid var(--border); }
+  .card-head h3 { font-size: 13px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600;
+    padding: 1px 7px; border-radius: 6px; background: var(--surface-2); color: var(--muted); white-space: nowrap;
+  }
+  .chip.ok { background: var(--ok-soft); color: var(--ok); }
+  .chip.warn { background: var(--warn-soft); color: var(--warn); }
+  .chip.danger { background: var(--danger-soft); color: var(--danger); }
+  .chip.brand { background: var(--brand-soft); color: var(--brand); }
+  .chip.teal { background: var(--accent-soft); color: var(--accent); }
+
+  /* ---------- 左：trace 列表 ---------- */
+  .tlist { max-height: 596px; overflow: auto; }
+  .titem {
+    padding: 10px 12px 10px 14px; border-bottom: 1px solid var(--border); cursor: pointer;
+    position: relative; transition: background .14s;
+  }
+  .titem:hover { background: #fafaff; }
+  .titem.on { background: var(--brand-soft); }
+  .titem.on::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--brand); }
+  .titem .l1 { display: flex; align-items: center; gap: 6px; }
+  .titem .t { font-family: var(--mono); font-size: 11px; color: var(--faint); }
+  .titem .q { font-size: 12.5px; font-weight: 600; margin: 3px 0 5px; line-height: 1.45;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .titem .l3 { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .titem .lat { font-family: var(--mono); font-size: 11px; font-weight: 700; padding: 0 6px; border-radius: 5px; }
+  .lat.fast { background: var(--ok-soft); color: var(--ok); }
+  .lat.mid { background: var(--warn-soft); color: var(--warn); }
+  .lat.slow { background: var(--danger-soft); color: var(--danger); }
+  .titem .meta { font-size: 11px; color: var(--faint); margin-left: auto; }
+  .loadmore { padding: 10px; text-align: center; font-size: 12px; color: var(--brand); cursor: pointer; }
+  .loadmore:hover { background: #fafaff; }
+
+  /* ---------- 右：详情 ---------- */
+  .dhead { padding: 12px 16px; border-bottom: 1px solid var(--border); }
+  .dhead .q { font-size: 15px; font-weight: 650; line-height: 1.5; }
+  .dhead .meta { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; margin-top: 8px; }
+  .dhead .meta .item { font-size: 11.5px; color: var(--muted); background: var(--surface-2); border-radius: 6px; padding: 2px 7px; }
+  .dhead .meta .item b { color: var(--text); font-weight: 650; }
+  .dhead .meta .item.mono { font-family: var(--mono); font-size: 11px; }
+
+  .wf-wrap { padding: 0 0 6px; }
+  .wf-legend { display: flex; align-items: center; gap: 14px; padding: 9px 16px; border-bottom: 1px solid var(--border); }
+  .wf-legend span { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); }
+  .wf-legend i { width: 9px; height: 9px; border-radius: 2px; display: inline-block; }
+  .wf-legend .sp { margin-left: auto; font-family: var(--mono); font-size: 11px; color: var(--faint); }
+
+  .wf-axis { display: grid; grid-template-columns: 224px 1fr; height: 26px; border-bottom: 1px solid var(--border); background: #fbfbfe; }
+  .wf-axis .ticks { position: relative; }
+  .wf-axis .tk {
+    position: absolute; top: 0; bottom: 0; border-left: 1px solid var(--border);
+    font-family: var(--mono); font-size: 10px; color: var(--faint); padding-left: 3px; line-height: 26px;
+  }
+  .wf-body { position: relative; padding: 4px 0 6px; }
+  .gridlayer { position: absolute; left: 224px; right: 0; top: 0; bottom: 0; pointer-events: none; z-index: 1; }
+  .gridlayer .gl { position: absolute; top: 0; bottom: 0; border-left: 1px dashed #e9eaf4; }
+  .gridlayer .ttft { position: absolute; top: 0; bottom: 0; border-left: 1px dashed var(--accent); }
+  .gridlayer .ttft span {
+    position: absolute; top: 2px; left: 4px; font-size: 10px; font-family: var(--mono);
+    color: var(--accent); background: #fff; padding: 0 3px; border-radius: 3px; white-space: nowrap;
+  }
+
+  .wf-row {
+    display: grid; grid-template-columns: 224px 1fr; align-items: center; height: 32px;
+    cursor: pointer; position: relative; z-index: 2;
+  }
+  .wf-row:hover { background: rgba(79,70,229,.045); }
+  .wf-row.sel { background: rgba(79,70,229,.08); box-shadow: inset 2px 0 0 var(--brand); }
+  .wf-label { display: flex; align-items: center; gap: 7px; padding-right: 10px; min-width: 0; }
+  .wf-label .dot { width: 7px; height: 7px; border-radius: 2px; flex: none; }
+  .wf-label .dot.span { background: var(--brand-3); }
+  .wf-label .dot.child { background: #c7cbf7; }
+  .wf-label .dot.gen { background: var(--accent); border-radius: 50%; }
+  .wf-label .dot.comp { background: #b8bfd4; }
+  .wf-label .nm { font-size: 12px; font-family: var(--mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .wf-label .nm.root { font-weight: 650; }
+  .wf-label .dura {
+    font-family: var(--mono); font-size: 9px; color: var(--accent); background: var(--accent-soft);
+    border-radius: 4px; padding: 0 4px; flex: none; letter-spacing: .04em;
+  }
+  .wf-label .tw { width: 12px; text-align: center; color: var(--faint); font-size: 9px; flex: none; }
+  .wf-track { position: relative; height: 32px; }
+  .bar {
+    position: absolute; top: 9px; height: 14px; border-radius: 4px; min-width: 4px;
+    display: flex; align-items: center; justify-content: flex-end; padding-right: 5px;
+    font-family: var(--mono); font-size: 9.5px; color: #fff; font-weight: 600;
+    box-shadow: 0 1px 2px rgba(24,22,64,.14); transition: filter .15s;
+  }
+  .bar:hover { filter: brightness(1.08); }
+  .bar.span { background: linear-gradient(90deg, #6366f1, #818cf8); }
+  .bar.child { background: linear-gradient(90deg, #a5aefb, #c3c9fb); color: #3b3f78; }
+  .bar.gen { background: linear-gradient(90deg, #0f9488, #2dd4bf); }
+  .bar.comp { background: linear-gradient(90deg, #94a3b8, #b8c1d1); }
+  .bar .out { position: absolute; left: calc(100% + 5px); color: var(--muted); font-weight: 600; white-space: nowrap; }
+
+  /* 节点详情（内联展开） */
+  .ndetail { background: #fbfbfe; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 12px 16px; }
+  .ndetail .nh { display: flex; align-items: center; gap: 8px; margin-bottom: 9px; }
+  .ndetail .nh b { font-family: var(--mono); font-size: 12px; }
+  .ndetail .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .ndetail .col { background: #fff; border: 1px solid var(--border); border-radius: 9px; overflow: hidden; }
+  .ndetail .col h4 {
+    font-size: 11px; letter-spacing: .04em; text-transform: uppercase; color: var(--faint);
+    padding: 6px 10px; border-bottom: 1px solid var(--border); background: #fcfcff;
+  }
+  .ndetail pre {
+    margin: 0; padding: 9px 10px; font-family: var(--mono); font-size: 11px; line-height: 1.65;
+    color: #33374f; max-height: 190px; overflow: auto; white-space: pre-wrap; word-break: break-word;
+  }
+  .ndetail .k { color: var(--brand); }
+  .ndetail .s { color: var(--accent); }
+  .ndetail .n { color: #b45309; }
+
+  /* 底部汇总 */
+  .summary { display: grid; grid-template-columns: 1.4fr 1fr; gap: 12px; margin-top: 12px; }
+  .ans { padding: 12px 14px; font-size: 12.5px; line-height: 1.75; color: #33374f; max-height: 148px; overflow: auto; }
+  .ans b { color: var(--text); }
+  .ans .cite { color: var(--brand); font-weight: 700; font-size: 11px; }
+  .rank { padding: 10px 14px; display: flex; flex-direction: column; gap: 7px; }
+  .rank .r { display: grid; grid-template-columns: 104px 1fr 48px; align-items: center; gap: 8px; font-size: 11.5px; }
+  .rank .r span:first-child { font-family: var(--mono); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rank .r .track { height: 8px; background: var(--surface-2); border-radius: 99px; overflow: hidden; }
+  .rank .r .track i { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, #6366f1, #a5b4fc); }
+  .rank .r .track i.hot { background: linear-gradient(90deg, #0f9488, #2dd4bf); }
+  .rank .r b { font-family: var(--mono); font-size: 11px; text-align: right; color: var(--muted); }
+
+  /* ---------- 方案 B ---------- */
+  .bview { display: none; }
+  .bview.on { display: block; }
+  .aview.off { display: none; }
+  .strip { display: flex; gap: 10px; overflow-x: auto; padding: 2px 2px 12px; }
+  .tcard {
+    flex: 0 0 208px; background: #fff; border: 1px solid var(--border); border-radius: 11px;
+    padding: 11px 12px; cursor: pointer; box-shadow: var(--shadow); position: relative; transition: .16s;
+  }
+  .tcard:hover { transform: translateY(-2px); border-color: var(--brand-3); }
+  .tcard.on { border-color: var(--brand); box-shadow: 0 0 0 2px var(--brand-soft), var(--shadow); }
+  .tcard .t { font-family: var(--mono); font-size: 10.5px; color: var(--faint); display: flex; justify-content: space-between; }
+  .tcard .q { font-size: 12.5px; font-weight: 650; margin: 5px 0 8px; line-height: 1.45; height: 36px; overflow: hidden;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .tcard .f { display: flex; align-items: center; gap: 6px; }
+  .tcard .spark { position: absolute; right: 10px; bottom: 10px; display: flex; align-items: flex-end; gap: 2px; height: 14px; }
+  .tcard .spark i { width: 3px; background: #d9dcf0; border-radius: 1px; display: block; }
+
+  .note {
+    max-width: 1560px; margin: 0 auto 40px; padding: 0 24px; color: var(--muted); font-size: 12.5px; line-height: 1.9;
+  }
+  .note h3 { font-size: 13px; color: var(--text); margin-bottom: 4px; }
+  .note code { font-family: var(--mono); font-size: 11.5px; background: #fff; border: 1px solid var(--border); border-radius: 5px; padding: 1px 5px; color: var(--brand); }
+</style>
+</head>
+<body>
+
+<div class="probe">
+  <div>
+    <h1>管理后台 · 链路追踪模块</h1>
+    <div class="sub">把 Langfuse 的 trace 数据搬进后台，不跳转、不用记第二个账号。以下为静态效果预览。</div>
+  </div>
+  <div class="seg" id="seg">
+    <button data-v="a" class="on">方案 A · 列表 + 瀑布</button>
+    <button data-v="b">方案 B · 卡片流 + 全宽瀑布</button>
+  </div>
+</div>
+
+<div class="frame">
+  <div class="chrome">
+    <div class="lights"><i></i><i></i><i></i></div>
+    <div class="url">127.0.0.1:18080/admin.html · 链路追踪</div>
+    <div style="width:56px"></div>
+  </div>
+
+  <div class="app">
+    <aside class="side">
+      <div class="logo">
+        <div class="mark">T</div>
+        <div><b>TradeRAG</b><small>Admin</small></div>
+      </div>
+      <div class="grp">运营</div>
+      <nav>
+        <a href="#"><span class="ic">◧</span>概览与能力</a>
+        <a href="#"><span class="ic">◐</span>Badcase</a>
+        <a href="#"><span class="ic">▤</span>批量评测</a>
+      </nav>
+      <div class="grp">诊断</div>
+      <nav>
+        <a href="#"><span class="ic">⌕</span>召回测试台</a>
+        <a href="#"><span class="ic">▦</span>SQL 通道</a>
+        <a href="#" class="on"><span class="ic">⌁</span>链路追踪<span class="pill">新</span></a>
+        <a href="#"><span class="ic">◔</span>监控看板</a>
+      </nav>
+      <div class="grp">治理</div>
+      <nav>
+        <a href="#"><span class="ic">⛨</span>合规</a>
+        <a href="#"><span class="ic">⚙</span>模型配置</a>
+      </nav>
+      <div class="who"><div class="av">A</div><span>admin · 管理员</span></div>
+    </aside>
+
+    <main>
+      <div class="page-head">
+        <div>
+          <div class="crumb">管理后台 / 诊断 / <b>链路追踪</b></div>
+          <h1>链路追踪</h1>
+          <div class="desc">每一次问答的完整调用链：合规预检 → 检索 → 重排 → 生成 → 输出合规</div>
+        </div>
+        <div class="row">
+          <a class="btn" href="#">在 Langfuse 中打开 ↗</a>
+          <button class="btn pri">刷新</button>
+        </div>
+      </div>
+
+      <!-- ================= 方案 A ================= -->
+      <div class="aview" id="viewA">
+        <div class="toolbar">
+          <div class="field"><label>时间</label>
+            <select><option>最近 1 小时</option><option>最近 24 小时</option><option>最近 7 天</option></select>
+          </div>
+          <div class="field"><label>分支</label>
+            <select><option>全部</option><option>知识库问答（kb）</option><option>SQL 通道（sql）</option><option>拒答（blocked）</option></select>
+          </div>
+          <div class="field"><label>状态</label>
+            <select><option>全部</option><option>仅慢请求 &gt; 10s</option><option>仅降级 / 报错</option><option>仅 0 命中</option></select>
+          </div>
+          <input class="search" placeholder="搜索问题关键词 / trace id" />
+          <div style="margin-left:auto" class="row">
+            <label class="toggle"><i></i> 30s 自动刷新</label>
+            <button class="btn sm">导出</button>
+          </div>
+        </div>
+
+        <div class="stats" id="statsA"></div>
+
+        <div class="split">
+          <div class="card">
+            <div class="card-head"><h3>最近调用</h3><span class="chip">共 128 条</span></div>
+            <div class="tlist" id="tlist"></div>
+            <div class="loadmore">加载更多</div>
+          </div>
+
+          <div class="card" id="detailA"></div>
+        </div>
+      </div>
+
+      <!-- ================= 方案 B ================= -->
+      <div class="bview" id="viewB">
+        <div class="stats" id="statsB"></div>
+        <div class="card" style="padding:12px 14px 4px;margin-bottom:14px">
+          <div class="spread" style="margin-bottom:10px">
+            <h3 style="font-size:13px">最近调用（点击切换）</h3>
+            <span class="chip">128 条 · 按时间倒序</span>
+          </div>
+          <div class="strip" id="strip"></div>
+        </div>
+        <div class="card" id="detailB"></div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<div class="note">
+  <h3>这张图里的数据全部来自真实 trace</h3>
+  <code>ec186c4cab6d4085</code> · 2026-11-16 21:37 · 22.1s · 9 个节点 · 1415 token。<br />
+  关键读数：检索吃掉 13.9s（其中翻译变体 6.8s、向量召回 3.8s、重排 2.3s），首字 13.9s，生成 5.4s，输出合规 2.8s。
+  这正是"慢在哪"一眼可见的价值。
+</div>
+
+<script>
+/* ---------------- 真实数据 ---------------- */
+const TOTAL = 22.119;
+
+const NODES = [
+  { n: "compliance.precheck", t: "span", s: 0.001, d: 0.004, depth: 0, k: "comp" },
+  { n: "retrieval", t: "span", s: 0.006, d: 13.870, depth: 0, k: "span", root: true },
+  { n: "vector-channel", t: "span", s: 0.009, d: 3.808, depth: 1, k: "child" },
+  { n: "bm25-channel", t: "span", s: 3.817, d: 0.006, depth: 1, k: "child" },
+  { n: "translate-variants", t: "span", s: 3.823, d: 6.834, depth: 1, k: "child" },
+  { n: "variant-channels", t: "span", s: 10.657, d: 0.964, depth: 1, k: "child" },
+  { n: "rerank", t: "span", s: 11.621, d: 2.255, depth: 1, k: "child" },
+  { n: "llm.stream", t: "generation", s: 13.881, d: 5.431, depth: 0, k: "gen", root: true },
+  { n: "compliance.output", t: "span", s: 19.313, d: 2.806, depth: 0, k: "comp" }
+];
+
+const NODE_DETAIL = {
+  "vector-channel": {
+    input: '{\n  "query": "不锈钢法兰的材质和压力等级有什么要求？",\n  "kb_ids": [1, 2],\n  "top_k": 5\n}',
+    output: '{\n  "count": 5,\n  "hits": [\n    {\n      "chunk_id": "c-1042",\n      "score": 0.7523,\n      "doc": "spec2.txt",\n      "page": 3,\n      "lang": "zh",\n      "snippet": "不锈钢法兰材质应采用 304 奥氏体不锈钢，压力等级按 PN16 / Class150 执行……"\n    },\n    {\n      "chunk_id": "c-1043",\n      "score": 0.7188,\n      "doc": "spec2.txt",\n      "page": 4,\n      "lang": "zh",\n      "snippet": "如客户指定 316L，须在订单备注栏单独注明，价格按 316L 另行核算……"\n    }\n  ]\n}'
+  },
+  "translate-variants": {
+    input: '{\n  "query": "不锈钢法兰的材质和压力等级有什么要求？"\n}',
+    output: '{\n  "en": "What are the requirements for the material and pressure rating of stainless steel flanges?",\n  "es": "¿Cuáles son los requisitos de material y clase de presión de las bridas de acero inoxidable?",\n  "ar": "ما هي متطلبات المواد ودرجة الضغط لأغطية الفلنجات المصنوعة من الفولاذ المقاوم للصدأ؟",\n  "degraded": false,\n  "took_ms": 6834\n}'
+  },
+  "rerank": {
+    input: '{\n  "query": "不锈钢法兰的材质和压力等级有什么要求？",\n  "candidates": 5,\n  "provider": "bge-reranker-base"\n}',
+    output: '{\n  "before": [\n    { "chunk_id": "c-1042", "score": 0.0328 },\n    { "chunk_id": "c-2077", "score": 0.0281 },\n    { "chunk_id": "c-1043", "score": 0.0264 }\n  ],\n  "after": [\n    { "chunk_id": "c-1042", "rerank": 0.9412 },\n    { "chunk_id": "c-1043", "rerank": 0.9033 },\n    { "chunk_id": "c-2077", "rerank": 0.5187 }\n  ],\n  "note": "c-1043 由第 3 位提到第 2 位"\n}'
+  },
+  "llm.stream": {
+    input: '{\n  "model": "MiniMax-M3.1-Flash",\n  "messages": [\n    { "role": "system", "content": "你是外贸业务助理，仅依据给定资料回答……" },\n    { "role": "user", "content": "问题 + 5 条证据" }\n  ]\n}',
+    output: '{\n  "output": "- **材质要求**：不锈钢法兰可选 304 或 316L；本项目要求 304……",\n  "usage": { "input": 833, "output": 582, "total": 1415, "reasoning": 412 },\n  "first_token_ms": 12957,\n  "chars": 384\n}'
+  },
+  "retrieval": {
+    input: '{\n  "query": "不锈钢法兰的材质和压力等级有什么要求？",\n  "top_k": 5,\n  "crosslingual": true\n}',
+    output: '{\n  "top3": [\n    { "chunk_id": "c-1042", "score": 0.0328, "doc": "spec2.txt" },\n    { "chunk_id": "c-1043", "score": 0.0291, "doc": "spec2.txt" },\n    { "chunk_id": "c-2077", "score": 0.0244, "doc": "faq.txt" }\n  ],\n  "channels": { "vector": 5, "bm25": 4, "hybrid": 5 },\n  "degraded": false\n}'
+  },
+  "compliance.precheck": {
+    input: '{ "query": "...", "user": "demo_sales", "role": "sales" }',
+    output: '{\n  "action": "pass",\n  "blocked": false,\n  "layer": "lexicon+rule",\n  "hits": [],\n  "took_ms": 4\n}'
+  },
+  "compliance.output": {
+    input: '{ "query": "...", "chars": 384 }',
+    output: '{\n  "action": "pass",\n  "blocked": false,\n  "rewritten": false,\n  "took_ms": 2806\n}'
+  },
+  "bm25-channel": {
+    input: '{ "query": "...", "kb_ids": [1, 2], "top_k": 5 }',
+    output: '{ "count": 4, "hits": [ { "chunk_id": "c-1042", "score": 19.31, "doc": "spec2.txt" } ] }'
+  },
+  "variant-channels": {
+    input: '{ "variants": ["en", "es", "ar"] }',
+    output: '{\n  "per_lang": {\n    "en": { "vector": 4, "bm25": 3 },\n    "es": { "vector": 3, "bm25": 2 },\n    "ar": { "vector": 2, "bm25": 1 }\n  }\n}'
+  }
+};
+
+const LIST = [
+  { id: "ec186c4cab6d4085", t: "21:37:37", q: "不锈钢法兰的材质和压力等级有什么要求？", lat: 22.1, branch: "kb", refs: 5, tok: 1415, on: true },
+  { id: "a72f31c09b4e2d10", t: "21:36:02", q: "球阀的强度试验压力是多少？", lat: 4.2, branch: "kb", refs: 3, tok: 980 },
+  { id: "5d1c8b7a20f9e643", t: "21:35:18", q: "你们接受哪些付款方式？T/T 还是 L/C？", lat: 1.8, branch: "sql", refs: 0, tok: 412 },
+  { id: "9b04e7d1c83a5f26", t: "21:34:44", q: "法兰出厂包装有什么要求，木箱还是托盘？", lat: 9.6, branch: "kb", refs: 4, tok: 1203 },
+  { id: "3e8a5f92b71c4d08", t: "21:32:11", q: "询盘报价的汇率按哪一天算？", lat: 15.3, branch: "kb", refs: 5, tok: 1678, slow: true },
+  { id: "c41d6a08e5b93f27", t: "21:30:05", q: "能开形式发票吗？", lat: 0.9, branch: "blocked", refs: 0, tok: 0, block: true },
+  { id: "7f2b9e4d16c8a350", t: "21:28:53", q: "316L 和 304 在实际使用中有什么区别？", lat: 12.4, branch: "kb", refs: 5, tok: 1502 },
+  { id: "b58c0a71d94e6f83", t: "21:25:30", q: "30% 定金、70% 见提单副本，可以吗？", lat: 2.1, branch: "sql", refs: 0, tok: 388 }
+];
+
+const STATS = [
+  { k: "今日问答", v: "128", u: "次", h: "拒答 6 · 降级 1", cls: "" },
+  { k: "端到端 P95", v: "19.2", u: "s", h: "目标 ≤ 8s", cls: "dangerline" },
+  { k: "首字 P95", v: "13.9", u: "s", h: "MiniMax 推理模型", cls: "warnline" },
+  { k: "完整率", v: "98.4", u: "%", h: "排除用户取消", cls: "okline" }
+];
+
+/* ---------------- 渲染 ---------------- */
+function fmt(d) {
+  if (d < 1) return Math.round(d * 1000) + "ms";
+  return d.toFixed(2) + "s";
+}
+function latCls(v) { return v < 5 ? "fast" : v < 10 ? "mid" : "slow"; }
+function branchChip(b) {
+  if (b === "kb") return '<span class="chip brand">kb</span>';
+  if (b === "sql") return '<span class="chip teal">sql</span>';
+  return '<span class="chip warn">blocked</span>';
+}
+function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+function renderStats(el) {
+  el.innerHTML = STATS.map((s) => `
+    <div class="stat ${s.cls}">
+      <div class="k">${s.k}</div>
+      <div class="v">${s.v}<small>${s.u}</small></div>
+      <div class="h">${s.h}</div>
+    </div>`).join("");
+}
+
+function renderList(el) {
+  el.innerHTML = LIST.map((x) => `
+    <div class="titem ${x.on ? "on" : ""}" data-id="${x.id}">
+      <div class="l1">
+        <span class="t">${x.t}</span>
+        <span class="lat ${latCls(x.lat)}">${x.lat.toFixed(1)}s</span>
+        <span class="meta">${x.tok ? x.tok + " tok" : "—"}</span>
+      </div>
+      <div class="q">${esc(x.q)}</div>
+      <div class="l3">
+        ${branchChip(x.branch)}
+        <span class="chip">${x.refs} 引用</span>
+        ${x.slow ? '<span class="chip danger">慢</span>' : ""}
+        ${x.block ? '<span class="chip warn">已拦截</span>' : ""}
+      </div>
+    </div>`).join("");
+  el.querySelectorAll(".titem").forEach((n) => {
+    n.addEventListener("click", () => {
+      el.querySelectorAll(".titem").forEach((m) => m.classList.remove("on"));
+      n.classList.add("on");
+    });
+  });
+}
+
+function renderStrip(el) {
+  el.innerHTML = LIST.slice(0, 7).map((x) => `
+    <div class="tcard ${x.on ? "on" : ""}" data-id="${x.id}">
+      <div class="t"><span>${x.t}</span><span>${x.id.slice(0, 8)}</span></div>
+      <div class="q">${esc(x.q)}</div>
+      <div class="f">
+        <span class="lat ${latCls(x.lat)}">${x.lat.toFixed(1)}s</span>
+        ${branchChip(x.branch)}
+      </div>
+      <div class="spark">
+        ${[5, 9, 14, 8, 12, 6, 10].map((h) => `<i style="height:${h}px"></i>`).join("")}
+      </div>
+    </div>`).join("");
+  el.querySelectorAll(".tcard").forEach((n) => {
+    n.addEventListener("click", () => {
+      el.querySelectorAll(".tcard").forEach((m) => m.classList.remove("on"));
+      n.classList.add("on");
+    });
+  });
+}
+
+let selNode = "vector-channel";
+
+function renderDetail(el, compact) {
+  const ticks = [0, 5, 10, 15, 20];
+  const axis = ticks.map((t) => `<div class="tk" style="left:${(t / TOTAL) * 100}%">${t}s</div>`).join("");
+  const grid = ticks.map((t) => `<div class="gl" style="left:${(t / TOTAL) * 100}%"></div>`).join("");
+
+  const rows = NODES.map((x, i) => {
+    const left = (x.s / TOTAL) * 100;
+    const w = (x.d / TOTAL) * 100;
+    const inner = (w > 13 || left + w > 86) ? `<span>${fmt(x.d)}</span>` : "";
+    const outer = inner ? "" : `<span class="out">${fmt(x.d)}</span>`;
+    return `
+      <div class="wf-row ${x.n === selNode ? "sel" : ""}" data-n="${x.n}">
+        <div class="wf-label" style="padding-left:${12 + x.depth * 18}px">
+          <span class="tw">${x.depth ? "└" : ""}</span>
+          <span class="dot ${x.k}"></span>
+          <span class="nm ${x.root ? "root" : ""}">${x.n}</span>
+          ${x.t === "generation" ? '<span class="dura">GEN</span>' : ""}
+        </div>
+        <div class="wf-track">
+          <div class="bar ${x.k}" style="left:${left}%;width:${w}%">${inner}${outer}</div>
+        </div>
+      </div>
+      ${x.n === selNode ? renderNodeDetail(x) : ""}`;
+  }).join("");
+
+  el.innerHTML = `
+    <div class="dhead">
+      <div class="q">不锈钢法兰的材质和压力等级有什么要求？</div>
+      <div class="meta">
+        <span class="item mono">ec186c4cab6d4085</span>
+        <span class="item">2026-11-16 21:37:37</span>
+        <span class="item">总耗时 <b>22.12s</b></span>
+        <span class="item">首字 <b>13.9s</b></span>
+        <span class="item">1415 token</span>
+        <span class="item">5 引用</span>
+        <span class="chip brand">kb</span>
+        <span class="chip ok">完成</span>
+      </div>
+    </div>
+    <div class="wf-legend">
+      <span><i style="background:#818cf8"></i>span</span>
+      <span><i style="background:#c7cbf7"></i>子阶段</span>
+      <span><i style="background:#0d9488"></i>generation</span>
+      <span><i style="background:#b8bfd4"></i>合规</span>
+      <span class="sp">点击节点查看输入 / 输出</span>
+    </div>
+    <div class="wf-wrap">
+      <div class="wf-axis">
+        <div style="padding:0 0 0 12px;font-size:11px;color:var(--faint);line-height:26px">调用链</div>
+        <div class="ticks">${axis}</div>
+      </div>
+      <div class="wf-body">
+        <div class="gridlayer">
+          ${grid}
+          <div class="ttft" style="left:${(13.881 / TOTAL) * 100}%"><span>首字 13.9s</span></div>
+        </div>
+        ${rows}
+      </div>
+    </div>
+    ${compact ? "" : `
+    <div class="summary">
+      <div class="card" style="box-shadow:none">
+        <div class="card-head"><h3>答案与引用</h3><span class="chip">384 字 · 5 条引用</span></div>
+        <div class="ans">
+          <b>材质要求</b>：不锈钢法兰可选 <b>304</b> 或 <b>316L</b>；本项目要求 <b>304</b>。如选择 316L，必须在订单中单独注明。<span class="cite">[1][2][3][5]</span><br />
+          <b>压力等级</b>：按 PN16 / Class150 执行，试验压力为设计压力的 1.5 倍。<span class="cite">[2][4]</span>
+        </div>
+      </div>
+      <div class="card" style="box-shadow:none">
+        <div class="card-head"><h3>阶段耗时排行</h3><span class="chip">共 9 节点</span></div>
+        <div class="rank">
+          ${[["translate-variants", 6.834, true], ["llm.stream", 5.431, true], ["vector-channel", 3.808, false],
+             ["compliance.output", 2.806, false], ["rerank", 2.255, false]]
+            .map(([n, d, hot]) => `
+              <div class="r"><span>${n}</span>
+                <div class="track"><i class="${hot ? "hot" : ""}" style="width:${(d / 6.834) * 100}%"></i></div>
+                <b>${d.toFixed(2)}s</b></div>`).join("")}
+        </div>
+      </div>
+    </div>`}`;
+
+  el.querySelectorAll(".wf-row").forEach((r) => {
+    r.addEventListener("click", () => {
+      selNode = selNode === r.dataset.n ? null : r.dataset.n;
+      renderDetail(el, compact);
+    });
+  });
+}
+
+function renderNodeDetail(x) {
+  const d = NODE_DETAIL[x.n];
+  if (!d) return "";
+  const hl = (s) => esc(s)
+    .replace(/&quot;/g, '"')
+    .replace(/"([^"]+)":/g, '<span class="k">"$1"</span>:')
+    .replace(/: "([^"]*)"/g, ': <span class="s">"$1"</span>')
+    .replace(/: (\d+(?:\.\d+)?)/g, ': <span class="n">$1</span>');
+  return `
+    <div class="ndetail">
+      <div class="nh">
+        <b>${x.n}</b>
+        <span class="chip">${x.t}</span>
+        <span class="chip">${fmt(x.d)}</span>
+        <span class="chip">起点 ${x.s.toFixed(3)}s</span>
+      </div>
+      <div class="cols">
+        <div class="col"><h4>Input</h4><pre>${hl(d.input)}</pre></div>
+        <div class="col"><h4>Output</h4><pre>${hl(d.output)}</pre></div>
+      </div>
+    </div>`;
+}
+
+/* ---------------- 交互 ---------------- */
+renderStats(document.getElementById("statsA"));
+renderStats(document.getElementById("statsB"));
+renderList(document.getElementById("tlist"));
+renderStrip(document.getElementById("strip"));
+renderDetail(document.getElementById("detailA"), false);
+renderDetail(document.getElementById("detailB"), true);
+
+document.querySelectorAll("#seg button").forEach((b) => {
+  b.addEventListener("click", () => {
+    document.querySelectorAll("#seg button").forEach((x) => x.classList.remove("on"));
+    b.classList.add("on");
+    const a = b.dataset.v === "a";
+    document.getElementById("viewA").classList.toggle("off", !a);
+    document.getElementById("viewB").classList.toggle("on", !a);
+    if (a) renderDetail(document.getElementById("detailA"), false);
+    else renderDetail(document.getElementById("detailB"), true);
+  });
+});
+</script>
+</body>
+</html>

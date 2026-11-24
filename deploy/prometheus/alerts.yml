@@ -1,0 +1,210 @@
+# 告警规则（11-3 扩展版，对齐六大类指标）
+# 设计原则：
+# - 全部带 for，避免瞬时抖动叫醒人；
+# - 分母用 clamp_min 防 0 除；
+# - 业务类告警（点踩率）必须带样本量下限，否则 3 条反馈里 1 条点踩就 33%；
+# - Gauge 类（badcase 积压、DAU）不带 rate，直接用当前值。
+groups:
+  # ========== P0 运维可用性 ==========
+  - name: rag-slo
+    rules:
+      - alert: RagHighErrorRate
+        expr: |
+          sum(rate(rag_http_requests_total{status=~"5.."}[5m]))
+          / clamp_min(sum(rate(rag_http_requests_total[5m])), 1e-9) > 0.01
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "问答服务 5xx 超过 1%"
+          description: "当前 5xx 比例 {{ $value | humanizePercentage }}。先看 api 日志，再用 request_id 去 Langfuse 查报错 trace。"
+
+      - alert: RagChatP95Slow
+        expr: |
+          histogram_quantile(0.95,
+            sum by (le) (rate(rag_http_request_duration_seconds_bucket{route="/api/v1/chat"}[5m]))
+          ) > 15
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "问答端到端 P95 超过 15s（预算线）"
+          description: "当前 P95={{ $value | printf \"%.1f\" }}s。拆阶段看 retrieval/generation 哪个超预算。"
+
+      - alert: RagTTFTSlow
+        expr: |
+          histogram_quantile(0.95,
+            sum by (le) (rate(rag_ttft_seconds_bucket[10m]))
+          ) > 5
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "首 token P95 超过 5s（FR-209 目标 2.5s）"
+          description: "当前 TTFT P95={{ $value | printf \"%.1f\" }}s。推理模型首字慢，考虑切非推理模型。"
+
+      - alert: RagRetrievalEmptyHigh
+        expr: |
+          sum(rate(rag_retrieval_empty_total[15m]))
+          / clamp_min(sum(rate(rag_retrieval_total[15m])), 1e-9) > 0.05
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "检索 0 命中率超过 5%"
+          description: "当前 {{ $value | humanizePercentage }}。检查知识库是否为空、embedding 是否加载失败、权限过滤是否过严。"
+
+      - alert: HostMemoryLow
+        expr: |
+          node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes < 0.15
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "宿主机可用内存低于 15%"
+          description: "Docker VM 可用内存 {{ $value | humanizePercentage }}，先停 Langfuse 或压测进程。"
+
+  # ========== 11-3 新增：业务运营 ==========
+  - name: rag-business
+    rules:
+      # 点踩率（样本量 ≥20 前提）：用户要求设告警阈值
+      - alert: RagDownvoteRateHigh
+        expr: |
+          sum(rate(rag_feedback_total{rating="down"}[1h]))
+          / clamp_min(sum(rate(rag_feedback_total[1h])), 1e-9) > 0.15
+          and sum(rate(rag_feedback_total[1h])) > 0.005   # 1h 内至少约 20 条反馈
+        for: 30m
+        labels:
+          severity: warning
+        annotations:
+          summary: "点踩率超过 15%（样本量足够）"
+          description: "downvote ratio={{ $value | humanizePercentage }}。所有点踩已自动入 badcase 库，去 /monitor 看板看归因分布。"
+
+      # badcase 积压（open 状态持续 > 20）
+      - alert: RagBadcaseBacklog
+        expr: rag_badcase_open_total > 20
+        for: 2h
+        labels:
+          severity: warning
+        annotations:
+          summary: "待处理 badcase 积压 {{ $value | printf \"%.0f\" }} 条"
+          description: "pending/located/fixing 合计已超过 20。按归因（missing_knowledge / retrieval_miss）分流处理。"
+
+      # DAU 突降（比昨天同期 < 50%，且昨天 ≥ 10 才有意义）
+      - alert: RagDAUDrop
+        expr: |
+          rag_active_users_24h < rag_active_users_24h offset 1d * 0.5
+          and rag_active_users_24h offset 1d >= 10
+        for: 1h
+        labels:
+          severity: critical
+        annotations:
+          summary: "DAU 较昨日同期腰斩"
+          description: "今日 DAU={{ $value | printf \"%.0f\" }}（低于昨日同期 50%）。检查前端是否挂了、登录是否异常。"
+
+      # 问题重复率高（> 30%）：知识库缺漏信号
+      - alert: RagRepeatQuestionHigh
+        expr: rag_repeat_question_ratio_24h > 0.3
+        for: 2h
+        labels:
+          severity: info
+        annotations:
+          summary: "24h 问题重复率 {{ $value | humanizePercentage }} > 30%"
+          description: "大量用户问同样的问题，说明知识库对应领域缺漏，建议补齐。"
+
+  # ========== 11-3 新增：安全合规 ==========
+  - name: rag-security
+    rules:
+      # 合规拦截率异常（不是 spike，而是持续 > 30%）——可能规则误配
+      - alert: RagComplianceBlockRateHigh
+        expr: |
+          sum(rate(rag_compliance_block_layer_total[10m]))
+          / clamp_min(sum(rate(rag_stage_total{stage="accepted",result="entered"}[10m])), 1e-9) > 0.3
+          and sum(rate(rag_stage_total{stage="accepted",result="entered"}[10m])) > 0.05
+        for: 15m
+        labels:
+          severity: critical
+        annotations:
+          summary: "合规拦截率持续超过 30%（疑似规则误配）"
+          description: "当前 {{ $value | humanizePercentage }}。去合规管理页看哪条规则命中最多，是否误伤正常业务。"
+
+      # 安全拦截 spike（5min 内 > 10 次）——可能有人在试探
+      - alert: RagSecurityBlockSpike
+        expr: sum(rate(rag_security_blocked_total[5m])) * 300 > 10
+        for: 3m
+        labels:
+          severity: warning
+        annotations:
+          summary: "5min 内安全拦截 {{ $value | printf \"%.0f\" }} 次（疑似试探）"
+          description: "最近拦截事件激增，按 type 分类看是 rbac / prompt_injection / lexicon 哪个在触发。"
+
+      # RBAC 权限越权拦截（长期高）
+      - alert: RagRBACBlockHigh
+        expr: |
+          sum(rate(rag_security_blocked_total{type="rbac"}[1h])) * 3600 > 20
+        for: 30m
+        labels:
+          severity: warning
+        annotations:
+          summary: "1h 内 RBAC 越权拦截超过 20 次"
+          description: "可能是某个角色权限配置不当，或有人在尝试越权访问。"
+
+  # ========== 11-3 新增：稳定性 ==========
+  - name: rag-stability
+    rules:
+      # 降级率持续高（LLM / SQL 频繁 fallback）
+      - alert: RagDegradedRateHigh
+        expr: |
+          sum(rate(rag_degraded_total[15m]))
+          / clamp_min(sum(rate(rag_stage_total{stage="completed",result="entered"}[15m])), 1e-9) > 0.1
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "降级率超过 10%"
+          description: "当前 {{ $value | humanizePercentage }}。按 reason 分：translation_unavailable / llm_fallback / sql_fallback / rerank_skipped，定位哪个组件在掉。"
+
+      # LLM 错误分类集中（某类 > 5%）
+      - alert: RagLLMErrorHigh
+        expr: |
+          sum by (category) (rate(rag_error_category_total{category="llm"}[15m]))
+          / clamp_min(sum(rate(rag_http_requests_total{route="/api/v1/chat"}[15m])), 1e-9) > 0.05
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "LLM 类错误超过 5%"
+          description: "LLM provider 可能限流或挂了。"
+
+  # ========== 11-3 新增：知识库运营 ==========
+  - name: rag-knowledge
+    rules:
+      # 过期文档存量（Gauge 当前值）
+      - alert: RagExpiredDocsAccumulated
+        expr: rag_kb_documents_expired_total > 5
+        for: 1h
+        labels:
+          severity: info
+        annotations:
+          summary: "过期文档积压 {{ $value | printf \"%.0f\" }} 篇"
+          description: "知识库中有过期文档不再参与检索，建议知识管理员清理或续期。"
+
+      # 版本不一致（同一 doc 多个 active version）
+      - alert: RagVersionInconsistent
+        expr: rag_kb_versions_inconsistent_total > 0
+        for: 30m
+        labels:
+          severity: warning
+        annotations:
+          summary: "有 {{ $value | printf \"%.0f\" }} 个文档存在多 active 版本"
+          description: "可能导致新旧答案不一致。检查文档更新流程是否正确关闭旧版本。"
+
+      # 评测回归失败（retrieval_zh Recall@K 低于 0.7 持续）
+      - alert: RagEvalRecallDropped
+        expr: rag_eval_retrieval_recall{dataset="retrieval_zh"} < 0.7
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: "retrieval_zh Recall@K 掉到 {{ $value | printf \"%.2f\" }} < 0.7"
+          description: "调参（切分/嵌入/Prompt/模型）后跑了评测吗？Recall 掉了说明有回归，立即跑 run_eval.py 排查。"

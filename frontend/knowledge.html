@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>知识库 · TradeRAG</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23181640'/%3E%3Ccircle cx='9' cy='16' r='3' fill='%232dd4bf'/%3E%3Ctext x='15' y='22' font-family='Arial' font-size='16' font-weight='bold' fill='%23d9dbf4'%3ET%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="assets/app.css?v=20261117b" />
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar admin-side">
+    <div class="side-head" id="side-head"></div>
+    <div class="side-spacer"></div>
+    <div class="side-nav" id="side-nav"></div>
+    <div class="side-foot" id="side-foot"></div>
+  </aside>
+
+  <main class="admin-main">
+    <div class="page-head spread">
+      <div>
+        <h1>知识库</h1>
+        <p>上传后立即返回，解析 / OCR / 切分 / 向量化在后台队列执行，进度实时可见</p>
+      </div>
+      <div class="row">
+        <button class="btn" id="reindex-btn">重建索引</button>
+        <button class="btn primary" id="new-kb-btn">＋ 新建知识库</button>
+      </div>
+    </div>
+
+    <div class="page-body">
+      <div class="grid cols-3" id="kb-grid"></div>
+
+      <div class="grid cols-2" style="align-items:start">
+        <div class="card" id="upload-card">
+          <div class="card-head"><h3>上传文档</h3><span class="chip" id="upload-kb-chip">—</span></div>
+          <div class="card-body">
+            <form id="upload-form" class="stack" style="gap:12px">
+              <div class="grid cols-2" style="gap:10px">
+                <label class="field">文档类型
+                  <select name="doc_type">
+                    <option value="spec">产品规格</option>
+                    <option value="customs">报关单证</option>
+                    <option value="compliance">合规文件</option>
+                    <option value="policy">制度/流程</option>
+                    <option value="other">其他</option>
+                  </select>
+                </label>
+                <label class="field">权威级（0 最高）
+                  <select name="authority_level">
+                    <option value="0">T0 合规专区</option>
+                    <option value="1">T1 正式发布</option>
+                    <option value="2" selected>T2 一般资料</option>
+                    <option value="3">T3 草稿</option>
+                  </select>
+                </label>
+              </div>
+              <label class="field">语种（逗号分隔，可留空自动识别）
+                <input type="text" name="languages" placeholder="zh,en,es,ar" />
+              </label>
+              <label class="field">选择文件（PDF / DOCX / XLSX / TXT / MD，≤100MB）
+                <input type="file" name="file" required accept=".pdf,.docx,.xlsx,.txt,.md" />
+              </label>
+              <div class="row" style="justify-content:space-between">
+                <span class="small muted" id="upload-hint">上传即入队（毫秒返回），OCR 与向量化在后台进行</span>
+                <button class="btn primary" type="submit" id="upload-btn">上传并入队</button>
+              </div>
+              <div id="upload-result"></div>
+            </form>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <h3>文档列表</h3>
+            <div class="row">
+              <select id="doc-kb-filter" style="width:200px"></select>
+              <button class="btn sm" id="refresh-docs">刷新</button>
+            </div>
+          </div>
+          <div class="table-wrap max-h-420" id="doc-table"><div class="card-body small muted">加载中…</div></div>
+        </div>
+      </div>
+
+      <div class="card" id="jobs-card">
+        <div class="card-head">
+          <h3>处理任务</h3>
+          <div class="row" style="gap:8px">
+            <span class="chip" id="queue-mode">—</span>
+            <button class="btn sm" id="refresh-jobs">刷新</button>
+          </div>
+        </div>
+        <div class="card-body" id="jobs-body"><div class="small muted">加载中…</div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3>说明</h3><span class="chip">FR-104 / FR-109</span></div>
+        <div class="card-body grid cols-3" style="gap:14px">
+          <div><b>业务组隔离</b><div class="small muted">文档的业务组随知识库固定，客户端不能自选；检索时强制过滤，越权内容不会出现在候选里。</div></div>
+          <div><b>OCR 质量</b><div class="small muted">置信度低于阈值的页面会列出页码，供人工抽检；点击文档可查看分片与页码定位。</div></div>
+          <div><b>版本链</b><div class="small muted">更新文档是新增版本而非覆盖，旧版本保留可追溯；引用快照保存的是回答当时的原文。</div></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="drawer-root"></div>
+<div id="modal-root"></div>
+<script type="module" src="assets/knowledge.js?v=20261117b"></script>
+</body>
+</html>
