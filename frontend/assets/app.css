@@ -419,7 +419,7 @@ select.dd-hidden { display: none !important; }
 .llm-test-badge { margin-left: 2px; }
 
 /* ==================================================================
-   v3 设计稿落地（对照 docs/ui-preview/shot-*.png）
+   v3 设计稿落地
    结构：.app > aside.sidebar + main；样式覆盖旧类名，JS 契约不变
    ================================================================== */
 

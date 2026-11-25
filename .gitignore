@@ -41,8 +41,6 @@ backend/data/pgdata/
 .snapshot/
 _d.json
 _e2e_ctx.json
-docs/ui-smoke/node_modules/
-docs/ui-preview/node_modules/
 
 # ---- IDE / OS ----
 .idea/
